@@ -37,6 +37,16 @@ app.use('/api/auth', authRoutes); // Auth is Global
 // Maxtron Module Routes
 app.use('/api/maxtron', maxtronRoutes);
 
+// Root endpoint
+app.get('/', (req, res) => {
+    res.json({
+        status: 'ok',
+        service: 'Maxtron ERP Backend API',
+        health: '/api/health',
+        timestamp: new Date().toISOString()
+    });
+});
+
 // Health Check
 app.get('/api/health', (req, res) => {
     res.json({ status: 'ok', message: 'Maxtron ERP Backend is healthy' });
