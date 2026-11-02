@@ -1,0 +1,49 @@
+{
+  "name": "maxtron-backend",
+  "version": "1.0.0",
+  "engines": {
+    "node": "22.x"
+  },
+  "description": "Maxtron ERP Backend",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon src/index.ts",
+    "start": "ts-node src/index.ts",
+    "build": "npx tsc --project tsconfig.json",
+    "migrate": "ts-node src/scripts/migrate.ts",
+    "alter-db": "ts-node src/scripts/alter-users.ts",
+    "alter-marketing-visits-vehicle": "ts-node src/scripts/alter-marketing-visits-vehicle.ts",
+    "alter-products-hsn": "ts-node src/scripts/alter-products-hsn.ts",
+    "alter-production-consumption": "ts-node src/scripts/alter-production-consumption.ts",
+    "alter-invoices-einvoice": "ts-node src/scripts/alter-invoices-einvoice.ts",
+    "alter-employee-licenses": "ts-node src/scripts/alter-employee-licenses.ts",
+    "alter-opening-stock": "ts-node src/scripts/alter-opening-stock.ts",
+    "alter-batch-item-link": "ts-node src/scripts/add-batch-item-link.ts",
+    "alter-quotation-format": "ts-node src/scripts/add_quotation_format_fields.ts",
+    "keep-alive": "ts-node src/scripts/keep-alive.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.42.7",
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.6",
+    "dotenv": "^17.3.1",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.3",
+    "pg": "^8.19.0",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^4.17.21",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "^25.3.3",
+    "@types/pg": "^8.18.0",
+    "nodemon": "^3.1.14",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  }
+}
