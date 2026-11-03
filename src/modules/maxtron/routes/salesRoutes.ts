@@ -17,6 +17,7 @@ router.delete('/orders/:id', protect, salesController.deleteOrder);
 // Invoices
 router.get('/invoices', protect, invoiceController.getAll);
 router.get('/invoices/next-number', protect, invoiceController.getNextNumber);
+router.get('/invoices/:id/bill-document', protect, invoiceController.getBillDocument);
 router.post('/invoices', protect, invoiceController.create);
 router.put('/invoices/:id', protect, invoiceController.update);
 router.delete('/invoices/:id', protect, invoiceController.delete);

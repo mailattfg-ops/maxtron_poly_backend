@@ -10,6 +10,9 @@ if (!supabaseUrl || !supabaseKey) {
     throw new Error('SUPABASE_URL and SUPABASE_SECRET_KEY (or SUPABASE_KEY) must be set in .env');
 }
 
+// Which kind of key is in use (never the key itself), shown by /api/verify.
+export const supabaseKeyType = supabaseKey.startsWith('sb_secret_') ? 'secret' : supabaseKey.startsWith('sb_publishable_') ? 'publishable' : 'legacy';
+
 const client = createClient(supabaseUrl, supabaseKey);
 
 // Custom extension to satisfy: "Apply ordering in every table query automatically"

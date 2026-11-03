@@ -46,7 +46,19 @@ export const InvoiceModel = {
             .order('created_at', { ascending: false });
 
         if (error) throw new Error(error.message);
-        return data || [];
+        // Attached bills are whole files stored as text (hundreds of kB each): the list only
+        // says whether one exists; getBillDocument loads it when the user opens it.
+        return (data || []).map(({ bill_document_url, ...inv }: any) => ({ ...inv, has_bill_document: !!bill_document_url }));
+    },
+
+    getBillDocument: async (id: string) => {
+        const { data, error } = await supabase
+            .from('sales_invoices')
+            .select('bill_document_url, bill_document_name')
+            .eq('id', id)
+            .single();
+        if (error) throw new Error(error.message);
+        return data;
     },
 
     getNextNumber: async (companyId?: string) => {
@@ -119,6 +131,10 @@ export const InvoiceModel = {
                 sanitizedHeader[f] = null;
             }
         });
+        // Not sent = keep the stored bill (the list no longer carries it, so a client that
+        // never loaded it must not wipe it). Sending '' still removes it on purpose.
+        if (!('bill_document_url' in header)) delete sanitizedHeader.bill_document_url;
+        if (!('bill_document_name' in header)) delete sanitizedHeader.bill_document_name;
 
         const { error: headerError } = await supabase
             .from('sales_invoices')
