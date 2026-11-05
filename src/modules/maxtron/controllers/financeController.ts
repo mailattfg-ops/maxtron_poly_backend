@@ -197,35 +197,22 @@ export const FinanceController = {
         try {
             const { companyId, startDate, endDate } = req.query;
 
-            const cId = companyId as string;
-            const sDate = startDate as string | undefined;
-            const eDate = endDate as string | undefined;
+            // Added up in the database (migrations/scorecard_totals.sql).
+            const { data: totals, error } = await supabase.rpc('scorecard_totals', {
+                p_company: companyId || null,
+                p_start: startDate || null,
+                p_end: endDate || null
+            });
+            if (error) throw new Error(error.message);
 
-            const runQuery = async (table: string, column: string, dateColumn: string): Promise<any[]> => {
-                let q = supabase.from(table).select(column).eq('company_id', cId);
-                if (sDate) q = (q as any).gte(dateColumn, sDate);
-                if (eDate) q = (q as any).lte(dateColumn, eDate);
-                const { data } = await q;
-                return (data as any[]) || [];
-            };
-
-            const [sales, purchases, collections, payments, expenses] = await Promise.all([
-                runQuery('sales_invoices', 'net_amount', 'invoice_date'),
-                runQuery('purchase_entries', 'total_amount', 'entry_date'),
-                runQuery('customer_collections', 'amount', 'collection_date'),
-                runQuery('supplier_payments', 'amount', 'payment_date'),
-                runQuery('petty_cash', 'amount', 'expense_date')
-            ]);
-
+            const t = (key: string) => Number((totals as any)?.[key] || 0);
             const summary = {
-                totalSales: sales.reduce((sum: number, item: any) => sum + Number(item.net_amount), 0),
-                totalPurchases: purchases.reduce((sum: number, item: any) => sum + Number(item.total_amount), 0),
-                totalCollections: collections.reduce((sum: number, item: any) => sum + Number(item.amount), 0),
-                totalPayments: payments.reduce((sum: number, item: any) => sum + Number(item.amount), 0),
-                totalExpenses: expenses.reduce((sum: number, item: any) => sum + Number(item.amount), 0),
-                cashInHand: collections.reduce((sum: number, item: any) => sum + Number(item.amount), 0) -
-                    (payments.reduce((sum: number, item: any) => sum + Number(item.amount), 0) +
-                        expenses.reduce((sum: number, item: any) => sum + Number(item.amount), 0))
+                totalSales: t('sales'),
+                totalPurchases: t('purchases'),
+                totalCollections: t('collections'),
+                totalPayments: t('payments'),
+                totalExpenses: t('expenses'),
+                cashInHand: t('collections') - (t('payments') + t('expenses'))
             };
 
             res.json({ success: true, data: summary });
