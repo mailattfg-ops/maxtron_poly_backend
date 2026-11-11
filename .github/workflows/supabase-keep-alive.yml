@@ -12,7 +12,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Ping Supabase Database
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
         run: |
-          curl -i -X GET "${{ secrets.SUPABASE_URL }}/rest/v1/companies?select=id&limit=1" \
-          -H "apikey: ${{ secrets.SUPABASE_KEY }}" \
-          -H "Authorization: Bearer ${{ secrets.SUPABASE_KEY }}"
+          # Name the missing secret instead of failing with a bare curl error
+          [ -n "$SUPABASE_URL" ] || { echo "::error::Repository secret SUPABASE_URL is not set"; exit 1; }
+          [ -n "$SUPABASE_KEY" ] || { echo "::error::Repository secret SUPABASE_KEY is not set"; exit 1; }
+          # --fail-with-body: a 401/404 fails the job instead of passing silently
+          curl --fail-with-body -sS "$SUPABASE_URL/rest/v1/companies?select=id&limit=1" \
+            -H "apikey: $SUPABASE_KEY" \
+            -H "Authorization: Bearer $SUPABASE_KEY"
